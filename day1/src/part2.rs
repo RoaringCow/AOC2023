@@ -6,6 +6,7 @@ fn main() -> io::Result<()> {
 
     let file = File::open("/home/ersan/aoc2023/day1/input.txt")?;
     let reader = BufReader::new(file);
+    let numbers = vec!["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero"];
 
     let mut lines: Vec<Vec<i32>> = Vec::new();
 
@@ -14,11 +15,9 @@ fn main() -> io::Result<()> {
         let mut line = line_result?;
 
 
-        line = line.replace("one", mapdigit("one")).replace("two", mapdigit("two"))
-            .replace("three", mapdigit("three")).replace("four", mapdigit("four"))
-            .replace("five", mapdigit("five")).replace("six", mapdigit("six"))
-            .replace("seven", mapdigit("seven")).replace("eight", mapdigit("eight"))
-            .replace("nine", mapdigit("nine")).replace("zero", mapdigit("zero"));
+         for number in &numbers {
+            line = line.replace(number, mapdigit(number));
+        }
 
         let mut line_numbers: Vec<i32> = Vec::new();
 
