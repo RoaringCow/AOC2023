@@ -9,7 +9,7 @@ fn main() -> io::Result<()> {
 
     let mut sum_power = 0;
 
-    for (j, line_result) in reader.lines().enumerate() {
+    for (_j, line_result) in reader.lines().enumerate() {
         let mut line = line_result?;
 
         let mut max_red = 0;
@@ -30,7 +30,7 @@ fn main() -> io::Result<()> {
             let mut blue = 0;
 
             for part in parts.iter_mut() {
-                part = part.trim();
+                *part = part.trim();
                 let splitted = part.split(" ").collect::<Vec<&str>>();
                 if part.contains("red") {
                     red += splitted[0].parse::<i32>().unwrap();
