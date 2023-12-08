@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-use std::io::Write;
 
 
 fn main() -> io::Result<()> {
@@ -115,8 +114,6 @@ fn main() -> io::Result<()> {
     for (i, card) in hands.iter().enumerate() {
 
         sum += card.1 * (i + 1) as u32;
-
-        let hand = card.0.clone();
 
         //println!("{}  : {}  {}   :   {}", card.0, card.1, i + 1, sum, );
     }

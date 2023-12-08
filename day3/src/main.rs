@@ -11,8 +11,8 @@ fn main() -> io::Result<()> {
 
     let mut numlines: Vec<Vec<char>>= Vec::new();
 
-    for (j, line_result) in reader.lines().enumerate() {
-        let mut line = line_result?;
+    for line_result in reader.lines() {
+        let  line = line_result?;
         let mut nums: Vec<char> = Vec::new();
 
         for character in line.chars(){
@@ -31,11 +31,11 @@ fn main() -> io::Result<()> {
             if character.is_numeric() {
                 let mut is_there = false;
                 if !check_around(j as i32, i as i32, &numlines).0 {
-                    let (right, isnumber, a) = check_around(j as i32 + 1, i as i32, &numlines);
+                    let (right, isnumber, _) = check_around(j as i32 + 1, i as i32, &numlines);
 
                     if !right && isnumber {
                         
-                        let (right, isnumber, a) = check_around(j as i32 + 2, i as i32, &numlines);
+                        let (right, isnumber, _) = check_around(j as i32 + 2, i as i32, &numlines);
                         if isnumber {
                             is_there = right;
                         }
@@ -45,11 +45,11 @@ fn main() -> io::Result<()> {
                     }
                     
                     if !is_there {
-                        let (left, isnumber, a) = check_around(j as i32 - 1, i as i32, &numlines);
+                        let (left, isnumber, _) = check_around(j as i32 - 1, i as i32, &numlines);
 
                         if !left && isnumber {
 
-                            let (left, isnumber, a) = check_around(j as i32 - 2, i as i32, &numlines);
+                            let (left, isnumber, _) = check_around(j as i32 - 2, i as i32, &numlines);
                             if isnumber {
                                 is_there = left;
                             }
