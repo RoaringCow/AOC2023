@@ -1,20 +1,8 @@
 import math
+from functools import reduce
 
-def find_gcd(x, y):
-    while y:
-        x, y = y, x % y
-    return x
-
-def find_lcm(numbers):
-    if len(numbers) < 2:
-
-    lcm = numbers[0]
-    for i in range(1, len(numbers)):
-        lcm = (lcm * numbers[i]) // find_gcd(lcm, numbers[i])
-
-    return lcm
-
-
+def lcm_of_list(numbers):
+    return reduce(math.lcm, numbers)
 
 with open("/home/ersan/AOC2023/day8/input.txt", "r") as file:
     lines = file.readlines()
@@ -40,6 +28,6 @@ with open("/home/ersan/AOC2023/day8/input.txt", "r") as file:
         print(step_count, current_pos)
         step_counts.append(step_count)
 
-    print(find_lcm(step_counts))
+    print(lcm_of_list(step_counts))
     
 
