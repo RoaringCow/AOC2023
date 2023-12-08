@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-
+use std::io::Write;
 
 
 fn main() -> io::Result<()> {
@@ -30,7 +30,7 @@ fn main() -> io::Result<()> {
         
         let bid = split[1].parse::<u32>().unwrap();
         
-        let mut card = split[0].replace("T", &char::from_u32('9' as u32 + 1).unwrap().to_string())
+        let card = split[0].replace("T", &char::from_u32('9' as u32 + 1).unwrap().to_string())
                                     .replace("J", &char::from_u32('2' as u32 - 1).unwrap().to_string())
                                     .replace("Q", &char::from_u32('9' as u32 + 3).unwrap().to_string())
                                     .replace("K", &char::from_u32('9' as u32 + 4).unwrap().to_string())
@@ -47,11 +47,12 @@ fn main() -> io::Result<()> {
             sorted.push((character.to_owned(), value.to_owned()))
         }
         
+
         sorted.sort_by_key(|a| a.1);
         
         let mut len = sorted.len();
         
-        if len != 1 && sorted.last().unwrap().0 != '1' {
+        if len != 1 || sorted.last().unwrap().0 != '1' {
             
             for (i, element) in sorted.clone().iter_mut().enumerate() {
                 if element.0 == '1' {
@@ -62,12 +63,7 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-        
-        for x in sorted.iter(){
-            //println!("{:?}  {}  {}", x, card, len);
-        }
-    
-    
+
         match len {
             1 => five_of_akind.push((card.to_string(), bid)),
             2 => {
@@ -102,7 +98,6 @@ fn main() -> io::Result<()> {
     two_pair.sort_by(|a, b| a.0.cmp(&b.0));
     one_pair.sort_by(|a, b| a.0.cmp(&b.0));
     high_card.sort_by(|a, b| a.0.cmp(&b.0));
-    
 
     hands.extend(high_card);
     hands.extend(one_pair);
@@ -114,10 +109,16 @@ fn main() -> io::Result<()> {
 
     let mut sum = 0;
 
+
+
+
     for (i, card) in hands.iter().enumerate() {
 
         sum += card.1 * (i + 1) as u32;
-        println!("{}  : {}", card.0, card.1);
+
+        let hand = card.0.clone();
+
+        //println!("{}  : {}  {}   :   {}", card.0, card.1, i + 1, sum, );
     }
     println!("{}", sum);
     Ok(())
