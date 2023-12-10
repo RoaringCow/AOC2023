@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-use std::{vec, usize};
 
 
 fn main() -> io::Result<()> {
@@ -15,8 +14,6 @@ fn main() -> io::Result<()> {
     
     let mut starting_pos: (usize, usize) = (1, 1);
     
-    
-    
     for (i, line_result) in reader.lines().enumerate() {
         let line = line_result?;
         
@@ -29,16 +26,15 @@ fn main() -> io::Result<()> {
     }
     println!("{:?}  {}", starting_pos, lines[starting_pos.1][starting_pos.0]);
     
-    
+
+    let mut cleared_map: Vec<Vec<char>> = vec![vec!['.'; lines[0].len()]; lines.len()];
+
     let mut pipe_lenght = 0;
-    
-    
+
     // 1 up, 2 right, 3 down, 4 left
     // i looked up the puzzle to find the s type. i will make another system later on.
     let mut direction = 3;
     let mut current_pos = starting_pos;
-
-    //println!("{:?}", distances);
     
     loop {
         match direction {
@@ -62,18 +58,21 @@ fn main() -> io::Result<()> {
         };
         
         pipe_lenght += 1;
+        cleared_map[current_pos.1][current_pos.0] = current_pipe;
         println!("{:?}", current_pos);
 
         if current_pos == starting_pos {
             break;
         }
     }
-    println!("{}", pipe_lenght / 2);
+    println!("part1: {}", pipe_lenght / 2);
 
-    
-    
-    
-
+    for x in cleared_map.iter(){
+        for y in x.iter() {
+            print!("{}", y);
+        }
+        println!();
+    }
     /*
     | is a vertical pipe connecting north and south.
     - is a horizontal pipe connecting east and west.
