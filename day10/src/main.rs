@@ -3,10 +3,7 @@ use std::io::{self, BufRead, BufReader};
 
 
 fn main() -> io::Result<()> {
-    
-    
-    
-    
+     
     let file = File::open("/home/ersan/AOC2023/day10/input.txt")?;
     let reader = BufReader::new(file);
     
