@@ -1,9 +1,14 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-
+//use std::{thread, time};
 
 fn main() -> io::Result<()> {
      
+
+    //let ten_millis = time::Duration::from_millis(10);
+
+
+
     let file = File::open("/home/ersan/AOC2023/day10/input.txt")?;
     let reader = BufReader::new(file);
     
@@ -32,6 +37,7 @@ fn main() -> io::Result<()> {
     let mut direction = 3;
     let mut current_pos = starting_pos;
     
+    //print!("\x1b[36m");
     loop {
         match direction {
             1 => current_pos.1 -= 1,
@@ -56,6 +62,22 @@ fn main() -> io::Result<()> {
         pipe_lenght += 1;
         cleared_map[current_pos.1][current_pos.0] = current_pipe;
 
+        /*
+        print!("\x1B[2J\x1B[1;1H");
+        
+        for x in cleared_map.iter(){
+            for y in x.iter(){
+                if *y != '.' {
+                    print!("\x1b[36m");
+                }else {
+                    print!("\x1b[0m");
+                }
+                print!("{}", y);
+            }
+            println!();
+        }
+        thread::sleep(ten_millis);
+        */
         if current_pos == starting_pos {
             break;
         }
@@ -95,6 +117,7 @@ fn main() -> io::Result<()> {
     . is ground; there is no pipe in this tile.
 */
 
+    print!("\x1b[0m");
     Ok(())
 }
 
