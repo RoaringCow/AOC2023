@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-
+use std::fs;
 
 
 
@@ -39,10 +39,21 @@ fn main() -> io::Result<()> {
         ranges.push((chunk[0], chunk[1]));
     }
 
+    let mut lowest: i64 = 1000000000000;
     for range in ranges.iter() {
-        println!("{:?}", range);
+
+        for seed in range.0..(range.0 + range.1 + 1) {
+            
+            let value = big_mapper(seed, &lines);
+            if value < lowest {
+                lowest = value;
+            }
+        }
     }
+    println!("{}", lowest);
     
+    let result_path = "/home/ersan/result.txt";
+    fs::write(result_path, lowest.to_string())?;
     
     
     
