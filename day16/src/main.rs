@@ -138,18 +138,28 @@ fn main() -> io::Result<()> {
 
     let mut max = 0;
 
-    for y in 0..lines.len(){
-        for x in 0..lines[0].len() {
-            for i in 1..5 {
-                let value = find_lenght(lines.clone(), (x as i32, y as i32), i);
-                if value > max {
-                    max = value;
-                }
-            } 
+    for i in 0..lines[0].len(){
+        let value = find_lenght(lines.clone(), (i as i32, 0 as i32), 3);
+        if value > max {
+            max = value;
         }
-        println!("{}: {}", y, max);
+        let value = find_lenght(lines.clone(), (i as i32, (lines.len() - 1) as i32), 1);
+        if value > max {
+            max = value;
+        }
+    }
+    for i in 0..lines.len(){
+        let value = find_lenght(lines.clone(), (0 as i32, i as i32), 2);
+        if value > max {
+            max = value;
+        }
+        let value = find_lenght(lines.clone(), ((lines[0].len() - 1) as i32, i as i32), 4);
+        if value > max {
+            max = value;
+        }
     }
     println!("{}", max);
+    
 
     Ok(())
 }
@@ -167,6 +177,7 @@ fn find_lenght(mut lines: Vec<Vec<Box>>, start_pos: (i32, i32), direction: i32) 
         let mut new_beams = beam.move_beam(&mut lines);
         beams.append(&mut new_beams);
     }
+
 
     lines.iter().flat_map(|line| line.iter()).filter(|box_| box_.energized.0).count() as i32
 
