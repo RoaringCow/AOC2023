@@ -1,7 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-#[allow(unused_imports)]
-use std::{thread, time};
+
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Beam {
@@ -22,70 +21,87 @@ impl Beam {
     pub fn move_beam(&mut self, grid: &mut Vec<Vec<Box>>) -> Vec<Beam> {
         let mut new_beam: Vec<Beam> = vec![];
 
-        match self.direction {
-            1 => self.pos.1 -= 1,
-            2 => self.pos.0 += 1,
-            3 => self.pos.1 += 1,
-            4 => self.pos.0 -= 1,
-            _ => ()
+
+
+
+        if !self.is_in(grid) {
+            return new_beam;
+        }
+        
+        if grid[self.pos.1 as usize][self.pos.0 as usize].energized.1.contains(&self.direction) {
+            return new_beam;
         }
 
-        // some cheating
-        if self.is_in(&grid) {
+        grid[self.pos.1 as usize][self.pos.0 as usize].energized.0 = true;
+        grid[self.pos.1 as usize][self.pos.0 as usize].energized.1.push(self.direction);
 
-            grid[self.pos.1 as usize][self.pos.0 as usize].energized = true;
+        match grid[self.pos.1 as usize][self.pos.0 as usize].tile_type {
+            '/' => {
+                let direction = match self.direction {
+                    1 => 2,
+                    2 => 1,
+                    3 => 4,
+                    4 => 3,
+                    _ => self.direction
+                };
+                new_beam.push(Beam::new(self.pos, direction));
+            },
+            '\\' => {
+                let direction = match self.direction {
+                    1 => 4,
+                    2 => 3,
+                    3 => 2,
+                    4 => 1,
+                    _ => self.direction
+                };
+                new_beam.push(Beam::new(self.pos, direction));
+            },
+            '|' => {
+                let direction = match self.direction {
+                    2 =>{
+                        new_beam.push(Beam::new(self.pos, 3));
+                        1
+                    },
+                    4 => {
+                        new_beam.push(Beam::new(self.pos, 3));
+                        1
+                    },
+                    _ => self.direction
+                };
+                new_beam.push(Beam::new(self.pos, direction));
+            },
+            '-' => {
+                let direction = match self.direction {
+                    1 => {
+                        new_beam.push(Beam::new(self.pos, 4));
+                        2
+                    },
+                    3 => {
+                        new_beam.push(Beam::new(self.pos, 4));
+                        2
+                    },
+                    _ => self.direction
+                };
+                new_beam.push(Beam::new(self.pos, direction));
+            },
+            _ => new_beam.push(Beam::new(self.pos, self.direction)),
+        }
 
-            match grid[self.pos.1 as usize][self.pos.0 as usize].tile_type {
-                '/' => {
-                    self.direction = match self.direction {
-                        1 => 2,
-                        2 => 1,
-                        3 => 4,
-                        4 => 3,
-                        _ => self.direction
-                    }
-                },
-                '\\' => {
-                    self.direction = match self.direction {
-                        1 => 4,
-                        2 => 3,
-                        3 => 2,
-                        4 => 1,
-                        _ => self.direction
-                    }
-                },
-                '|' => {
-                    self.direction = match self.direction {
-                        2 =>{
-                            new_beam.push(Beam::new(self.pos, 3));
-                            1
-                        },
-                        4 => {
-                            new_beam.push(Beam::new(self.pos, 3));
-                            1
-                        },
-                        _ => self.direction
-                    }
-                },
-                '-' => {
-                    self.direction = match self.direction {
-                        1 => {
-                            new_beam.push(Beam::new(self.pos, 4));
-                            2
-                        },
-                        3 => {
-                            new_beam.push(Beam::new(self.pos, 4));
-                            2
-                        },
-                        _ => self.direction
-                    }
-                },
-                _ => (),
+        for beam in new_beam.iter_mut() {
+
+            match beam.direction {
+                1 => beam.pos.1 -= 1,
+                2 => beam.pos.0 += 1,
+                3 => beam.pos.1 += 1,
+                4 => beam.pos.0 -= 1,
+                _ => ()
             }
-
         }
-    new_beam
-} 
+
+
+
+        new_beam
+    } 
 
     pub fn is_in(&self, grid: &Vec<Vec<Box>>) -> bool{
         if self.pos.0 >= 0 && self.pos.0 < grid[0].len() as i32 && self.pos.1 >= 0 && self.pos.1 < grid.len() as i32{
@@ -95,10 +111,10 @@ impl Beam {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug , Clone, PartialEq, Eq)]
 struct Box {
     tile_type: char,
-    energized: bool,
+    energized: (bool, Vec<u8>),
 }
 
 
@@ -107,47 +123,52 @@ fn main() -> io::Result<()> {
     let file = File::open("/home/ersan/AOC2023/day16/input.txt")?;
     let reader = BufReader::new(file);
 
-    let mut lines: Vec<Vec<Box>> = reader
+    let lines: Vec<Vec<Box>> = reader
         .lines()
         .map(|line| {
             line.unwrap()
                 .chars()
                 .map(|c| Box {
                     tile_type: c,
-                    energized: false,
+                    energized: (false, Vec::new()),
                 })
-                .collect()
+            .collect()
         })
-        .collect();
+    .collect();
 
+    let mut max = 0;
 
-    let mut beams: Vec<Beam> = vec![Beam::new((0, 0), 2)];
-    
-    for _ in 0..30 {
-        for x in 0..beams.len() {
-            let beam_to_add = beams[x].move_beam(&mut lines);
-            beams.extend(beam_to_add);
-        }
-        beams.retain(|x| x.is_in(&lines));
-        
-        let mut energized_count = 0;
-        for x in lines.iter() { 
-            for y in x.iter() {
-                if y.energized {
-                    //print!("#");
-                    energized_count += 1;
-                }else {
-                    //print!(".");
+    for y in 0..lines.len(){
+        for x in 0..lines[0].len() {
+            for i in 1..5 {
+                let value = find_lenght(lines.clone(), (x as i32, y as i32), i);
+                if value > max {
+                    max = value;
                 }
-            }
-           // println!();
+            } 
         }
-        println!("{}", energized_count);
-        
-        //thread::sleep(ten_millis);
-
+        println!("{}: {}", y, max);
     }
-
+    println!("{}", max);
 
     Ok(())
+}
+
+
+
+
+fn find_lenght(mut lines: Vec<Vec<Box>>, start_pos: (i32, i32), direction: i32) -> i32 {
+
+    let mut beams: Vec<Beam> = vec![Beam::new((start_pos.0, start_pos.1), direction as u8)];
+
+    while beams.len() > 0 {
+
+        let mut beam = beams.pop().unwrap();
+        let mut new_beams = beam.move_beam(&mut lines);
+        beams.append(&mut new_beams);
+    }
+
+    lines.iter().flat_map(|line| line.iter()).filter(|box_| box_.energized.0).count() as i32
+
+
 }
