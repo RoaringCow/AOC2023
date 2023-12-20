@@ -3,7 +3,6 @@ use std::io::{self, BufRead, BufReader};
 use std::collections::HashMap;
 
 
-#[allow(dead_code)]
 #[derive(Debug)]
 struct Workflow {
     name: String,
@@ -11,16 +10,22 @@ struct Workflow {
     last_option: String
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 struct Rule {
     value: i32,
-    categorie: u8,
+    category: u8,
     // < is true, > is false
     comparison_type: bool,
     destination: String
 }
 
+#[derive(Debug)]
+#[allow(dead_code)]
+struct Range {
+    category: u8,
+    min: i32,
+    max: i32
+}
 
 
 #[allow(dead_code, unused_variables,)]
@@ -47,7 +52,7 @@ fn main() -> io::Result<()> {
             let comparison_type = split[0].contains("<");
             let value = split[0][2..].parse::<i32>().unwrap();
             let destination = split[1].to_string();
-            let categorie = match split[0].chars().nth(0).unwrap() {
+            let category = match split[0].chars().nth(0).unwrap() {
                 'x' => 0,
                 'm' => 1,
                 'a' => 2,
@@ -58,7 +63,7 @@ fn main() -> io::Result<()> {
                 value,
                 comparison_type,
                 destination,
-                categorie,
+                category,
             });
         }
         workflows.insert(workflow.name.clone(), workflow);
@@ -81,12 +86,12 @@ fn main() -> io::Result<()> {
                 //println!("Rule: {:?}    {}", rule, part[rule.categorie as usize]);
                 match rule.comparison_type {
                     true => 
-                        if part[rule.categorie as usize] < rule.value {
+                        if part[rule.category as usize] < rule.value {
                             current_workflow = rule.destination.clone();
                             does_match = true;
                         }
                     false =>
-                        if part[rule.categorie as usize] > rule.value {
+                        if part[rule.category as usize] > rule.value {
                             current_workflow = rule.destination.clone();
                             does_match = true;
                         }
@@ -107,6 +112,6 @@ fn main() -> io::Result<()> {
         
     }
 
-    println!("Sum: {}", sum);
+    println!("Part1: {}", sum);
     Ok(())
 }
