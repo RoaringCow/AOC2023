@@ -20,13 +20,10 @@ struct Rule {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 struct Range {
-    category: u8,
     min: i32,
     max: i32
 }
-
 
 #[allow(dead_code, unused_variables,)]
 fn main() -> io::Result<()> {
@@ -37,7 +34,7 @@ fn main() -> io::Result<()> {
 
     let mut workflows: HashMap<String, Workflow> = HashMap::new();
 
-    for line in lines[..572].iter() {
+    for line in lines[..11].iter() {
         let mut workflow = Workflow {
             name: String::new(),
             rules: Vec::new(),
@@ -69,10 +66,10 @@ fn main() -> io::Result<()> {
         workflows.insert(workflow.name.clone(), workflow);
     }
 
-    let parts: Vec<Vec<i32>> = lines[573..].iter().map(|l| l[1..l.len() - 1].split(',').map(|n| n[2..].to_string().parse::<i32>().unwrap()).collect::<Vec<i32>>()).collect(); 
+    let parts: Vec<Vec<i32>> = lines[12..].iter().map(|l| l[1..l.len() - 1].split(',').map(|n| n[2..].to_string().parse::<i32>().unwrap()).collect::<Vec<i32>>()).collect(); 
 
 
-    let mut sum = 0;
+    let mut sum1 = 0;
 
     for part in parts.iter() {
         //println!("Part: {:?}", part);
@@ -107,11 +104,67 @@ fn main() -> io::Result<()> {
         if current_workflow == "A" {
             rule_sum = part.iter().sum();
         }
-        sum += rule_sum;
+        sum1 += rule_sum;
 
-        
+
     }
 
-    println!("Part1: {}", sum);
+
+    let current_workflow = "in";
+    let mut categories = vec![  Range { min: 1, max: 4000},
+                            Range { min: 1, max: 4000}, 
+                            Range { min: 1, max: 4000}, 
+                            Range { min: 1, max: 4000}];
+
+    println!("{}", count_possibilities(&workflows, current_workflow, &mut categories));
+
+    println!("Part1: {}", sum1);
     Ok(())
 }
+
+
+#[allow(dead_code)]
+fn count_possibilities(workflows: &HashMap<String, Workflow>, current_workflow: &str, categories: &mut Vec<Range>) -> i64 {
+
+    if current_workflow == "A"{
+        let sum = categories.iter().map(|c| c.max as i64 - c.min as i64 + 1).product();
+        println!("Sum: {}", sum);
+        return sum; 
+    }
+    if current_workflow == "R" {
+        return 0;
+    }
+    for rule in workflows.get(current_workflow).unwrap().rules.iter() {
+        println!("{:?}", categories);
+        match rule.comparison_type {
+            // < is true, > is false
+            true => 
+                if categories[rule.category as usize].max < rule.value {
+                    count_possibilities(workflows, &rule.destination, categories);
+                    break;
+
+                } else if categories[rule.category as usize].min < rule.value {
+                    categories[rule.category as usize].max = rule.value - 1;
+                    count_possibilities(workflows, &rule.destination, categories);
+                },
+            false => {
+                if categories[rule.category as usize].min > rule.value {
+                    count_possibilities(workflows, &rule.destination, categories);
+                    break;
+                } else if categories[rule.category as usize].max > rule.value {
+                    categories[rule.category as usize].min = rule.value + 1;
+                    count_possibilities(workflows, &rule.destination, categories);
+                }
+
+            }
+        
+        }
+    }
+
+
+
+    0
+}
+
+
+
