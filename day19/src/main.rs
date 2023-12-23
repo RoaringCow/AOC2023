@@ -19,7 +19,7 @@ struct Rule {
     destination: String
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Range {
     min: i32,
     max: i32
@@ -116,55 +116,41 @@ fn main() -> io::Result<()> {
                             Range { min: 1, max: 4000}, 
                             Range { min: 1, max: 4000}];
 
-    println!("{}", count_possibilities(&workflows, current_workflow, &mut categories));
+    do_things(&workflows, current_workflow, categories);
 
     println!("Part1: {}", sum1);
+    
+
+
+
+
     Ok(())
 }
 
 
-#[allow(dead_code)]
-fn count_possibilities(workflows: &HashMap<String, Workflow>, current_workflow: &str, categories: &mut Vec<Range>) -> i64 {
+fn do_things(workflows: &HashMap<String, Workflow>, current_workflow: &str, categories: Vec<Range>) {
+    let mut sum = 0;
 
-    if current_workflow == "A"{
-        let sum = categories.iter().map(|c| c.max as i64 - c.min as i64 + 1).product();
-        println!("Sum: {}", sum);
-        return sum; 
-    }
-    if current_workflow == "R" {
-        return 0;
-    }
-    for rule in workflows.get(current_workflow).unwrap().rules.iter() {
-        println!("{:?}", categories);
-        match rule.comparison_type {
-            // < is true, > is false
-            true => 
-                if categories[rule.category as usize].max < rule.value {
-                    count_possibilities(workflows, &rule.destination, categories);
-                    break;
 
-                } else if categories[rule.category as usize].min < rule.value {
-                    categories[rule.category as usize].max = rule.value - 1;
-                    count_possibilities(workflows, &rule.destination, categories);
+    let mut ranges: Vec<Vec<Range>> = vec![categories];
+
+    while let Some(range) = ranges.pop() {
+        for rule in workflows.get(current_workflow).unwrap().rules.iter() {
+            let mut new_range = range.clone();
+           
+            match rule.comparison_type {
+                // < is true, > is false
+                true => {
+
                 },
-            false => {
-                if categories[rule.category as usize].min > rule.value {
-                    count_possibilities(workflows, &rule.destination, categories);
-                    break;
-                } else if categories[rule.category as usize].max > rule.value {
-                    categories[rule.category as usize].min = rule.value + 1;
-                    count_possibilities(workflows, &rule.destination, categories);
+                false => {
+
                 }
 
             }
-        
+            ranges.push(new_range); 
         }
     }
-
-
-
-    0
 }
-
 
 
