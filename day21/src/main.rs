@@ -23,12 +23,19 @@ fn main() -> io::Result<()> {
                     c
                 })
             .collect();
-
+            for _ in 0..0 {
+                new_line.extend(new_line.clone());
+            }
             new_line.insert(0, '#');
             new_line.push('#');
             new_line
         })
     .collect();
+    
+
+    for _ in 0..0 {
+        lines.extend(lines.clone());
+    }
 
     lines.insert(0, vec!['#'; lines[0].len()]);
     lines.push(vec!['#'; lines[0].len()]);
@@ -46,8 +53,7 @@ fn main() -> io::Result<()> {
 
     let mut grid = lines.clone();
     let mut step_count = 0;
-    let max_step = 26501365;
-    let mut old = grid.clone();
+    let max_step = 32;
 
     while max_step > step_count {
         for x in grid.iter() {
@@ -70,11 +76,7 @@ fn main() -> io::Result<()> {
             grid[pos.1 as usize][pos.0 as usize] = '.';
         }
 
-        if compare(&grid, &reverse(old.clone())) {
-            println!("looping");
-            break;
-        } 
-        old = grid.clone();
+
         positions = current_positions.clone();
 
         step_count += 1;
@@ -83,38 +85,13 @@ fn main() -> io::Result<()> {
     let mut count = 0;
     for x in grid.iter() {
         for y in x.iter() {
-            print!("{}", y);
-            if *y == 'O' {
+            if y == &'O' {
                 count += 1;
             }
         }
-        println!();
     }
+    println!("{}", count);
 
-    println!("count: {}", count);
     Ok(())
 }
 
-fn reverse(mut grid: Vec<Vec<char>>) -> Vec<Vec<char>> {
-    for x in grid.iter_mut() {
-        for y in x.iter_mut() {
-            if *y == 'O' {
-                *y = '.';
-            } else if *y == '.' {
-                *y = 'O';
-            }
-        }
-    }
-    grid
-}
-
-fn compare(grid1: &Vec<Vec<char>>, grid2: &Vec<Vec<char>>) -> bool {
-    for y in 0..grid1.len() {
-        for x in 0..grid1[y].len() {
-            if grid1[y][x] != grid2[y][x] {
-                return false;
-            }
-        }
-    }
-    true
-}
